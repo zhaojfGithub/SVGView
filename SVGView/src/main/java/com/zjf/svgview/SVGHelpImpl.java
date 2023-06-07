@@ -28,9 +28,18 @@ import javax.xml.parsers.DocumentBuilderFactory;
 /**
  * @author zjf
  * @date 2023/5/29
+ * 处理SVG图片相关的类，支持继承重写，然后重新赋值给SVGView
  */
 public class SVGHelpImpl implements SVGHelpInterface {
 
+    /**
+     * 解析SVG文件，如果标注Path不为android:tag或者自定义了实体类 需要重写此方法
+     * @param context 上下文
+     * @param SVGId RAW文件夹的图片ID，可为null
+     * @param file 图片路径 可为null，
+     * @param color 住背景颜色
+     * @return 如果SVGId与file都为null，return null，否则return正常图片解析结果
+     */
     @Override
     public List<PathBean> deCodeSVG(Context context, Integer SVGId, File file, @ColorInt Integer color) throws IOException {
         InputStream inputStream = null;
@@ -72,6 +81,11 @@ public class SVGHelpImpl implements SVGHelpInterface {
         return null;
     }
 
+    /**
+     * 计算原本图片占位大小，不一定是svg本身所标识的大小
+     * @param list 解析文件
+     * @return 图片的RecF对象
+     */
     @Override
     public RectF getSVGRecF(List<PathBean> list) {
         if (list == null){
@@ -89,11 +103,20 @@ public class SVGHelpImpl implements SVGHelpInterface {
         return new RectF(left, top, right, bottom);
     }
 
+    /**
+     * 获取一个实体类，如果有自定义的实体，可以不用此方法，但是需要重写deCodeSVG
+     */
     @Override
     public PathBean getPathBean(Integer id, String tag, Path path, Integer color) {
         return new PathBean(id, tag, path, color, false);
     }
 
+    /**
+     * @param pathBean 数据
+     * @param canvas 画布
+     * @param paint 画笔
+     * @param LineColor 分割线颜色
+     */
     @Override
     public void onDraw(PathBean pathBean, Canvas canvas, Paint paint, Integer LineColor) {
         paint.setColor(pathBean.getColor());
@@ -106,6 +129,13 @@ public class SVGHelpImpl implements SVGHelpInterface {
         canvas.drawPath(pathBean.getPath(), paint);
     }
 
+    /**
+     * 判断点击区域是是否在Path内
+     * @param pathBean 数据
+     * @param x X轴坐标
+     * @param y Y轴坐标
+     * @return true false
+     */
     @Override
     public Boolean isClick(PathBean pathBean, Float x, Float y) {
         return pathBean.getRegion().contains(x.intValue(), y.intValue());

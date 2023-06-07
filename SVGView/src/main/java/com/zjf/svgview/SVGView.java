@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -30,10 +31,19 @@ import java.util.List;
  */
 public class SVGView extends View {
 
+    /**
+     * 默认阈值，一般不做修改，太少了会不好控制滑动和缩放
+     */
     private static final int MAX_MOVE_NUMBER = 5;
 
+    /**
+     * 默认移动速度
+     */
     private static final float MOVE_INIT_SPEED = 2;
 
+    /**
+     * 默认缩放速度
+     */
     private static final float ZOOM_INIT_SPEED = 3;
 
     private OnSVGClickListener onClickListener;
@@ -44,36 +54,92 @@ public class SVGView extends View {
 
     private File file;
 
+    /**
+     * 整体背景
+     */
     private int svgBackground;
 
+    /**
+     * 分割线颜色
+     */
     private int lineColor;
 
     private List<PathBean> PathList;
 
+    /**
+     * 当前缩放倍数
+     */
     private Float scale;
 
+    /**
+     * 图像的默认大小
+     */
     private RectF originRecF;
 
     private Paint paint;
 
+    /**
+     * 处理区域点击
+     */
     private GestureDetector gestureClick;
 
+    /**
+     * 处理手势移动
+     */
     private GestureDetector gestureMove;
 
+    /**
+     * 处理手势缩放
+     */
     private ScaleGestureDetector gestureZoom;
 
+    /**
+     * 区分缩放与滑动的阈值
+     */
     private int moveNumber = 0;
 
+    /**
+     * 当前位移的X轴距离
+     */
     private Float moveX = 0F;
 
+    /**
+     * 当前位移的Y轴距离
+     */
     private Float moveY = 0F;
 
+    /**
+     * 之前滑动的X轴距离(因为可能经历了多次滑动，所以需要记录一下)
+     */
+    private Float lastMoveX = 0F;
+
+    /**
+     * 之前滑动的Y轴距离
+     */
+    private Float lastMoveY = 0F;
+
+    /**
+     * 是否可以触发滑动
+     */
     private boolean isMove;
+    /**
+     * 移动的速度
+     */
     private float moveSpeed;
 
+    /**
+     * 是否可以触发缩放
+     */
     private boolean isZoom;
+
+    /**
+     * 缩放的速度
+     */
     private float zoomSpeed;
 
+    /**
+     * 主区域的颜色
+     */
     @ColorInt
     private Integer color;
 
@@ -187,8 +253,8 @@ public class SVGView extends View {
             public boolean onSingleTapUp(@NonNull MotionEvent e) {
                 boolean result = false;
                 for (PathBean pathBean : PathList) {
-                    float x = (e.getX() - (getWidth() - originRecF.width() * scale) / 2 - moveX) / scale;
-                    float y = (e.getY() - (getHeight() - originRecF.height() * scale) / 2 - moveY) / scale;
+                    float x = (e.getX() - (getWidth() - originRecF.width() * scale) / 2 - lastMoveX) / scale;
+                    float y = (e.getY() - (getHeight() - originRecF.height() * scale) / 2 - lastMoveY) / scale;
                     if (svgHelp.isClick(pathBean, x, y)) {
                         pathBean.setSelect(!pathBean.getSelect());
                         if (onClickListener != null) {
@@ -255,7 +321,11 @@ public class SVGView extends View {
                 if (!isZoom) {
                     return false;
                 }
-                scale += (detector.getScaleFactor() - lastScale) / zoomSpeed;
+                float scaleGap = (detector.getScaleFactor() - lastScale) / zoomSpeed;
+                //因为如果scale为负数，会造成图像倒转，到0会看不到，故设置为0.1
+                if (scale + scaleGap > 0.1) {
+                    scale += scaleGap;
+                }
                 invalidate();
                 return true;
             }
@@ -277,6 +347,7 @@ public class SVGView extends View {
         canvas.drawColor(svgBackground);
         //默认先移动到中间
         canvas.translate((getWidth() - originRecF.width() * scale) / 2, (getHeight() - originRecF.height() * scale) / 2);
+        canvas.translate(lastMoveX, lastMoveY);
         //处理手势位移
         canvas.translate(moveX, moveY);
         canvas.scale(scale, scale);
@@ -297,6 +368,13 @@ public class SVGView extends View {
             gestureZoom.onTouchEvent(event);
         }
         if (event.getAction() == MotionEvent.ACTION_UP) {
+            if (moveNumber > MAX_MOVE_NUMBER) {
+                //只有经历了滑动才记录
+                lastMoveX += moveX;
+                lastMoveY += moveY;
+                moveX = 0F;
+                moveY = 0F;
+            }
             moveNumber = 0;
         }
         return true;
