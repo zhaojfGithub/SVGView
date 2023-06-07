@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="SVGView">
+        <attr name="SVGId" format="reference" />
+        <attr name="SVGScale" format="float" />
+        <attr name="SVGBackground" format="color" />
+        <attr name="SVGColor" format="color" />
+        <attr name="SVGLineColor" format="color" />
+        <attr name="SVGIsMove" format="boolean" />
+        <attr name="SVGMoveSpeed" format="float" />
+        <attr name="SVGIsZoom" format="boolean" />
+        <attr name="SVGZoomSpeed" format="boolean" />
+    </declare-styleable>
+</resources>
