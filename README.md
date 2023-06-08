@@ -9,8 +9,7 @@ implementation 'io.github.zhaojfGithub.SVGView:SVGView:0.0.3'
 ```
 
 ### 效果图
-
-![默认](images/demonstration.gif)
+![默认](images/demonstration.gif){:height="50%" width="50%"}
 
 
 ### XML属性
