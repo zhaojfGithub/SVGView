@@ -4,7 +4,14 @@
 
 ### 引入
 
-建议直接下载下来当成model引入，后续上传到maven再改
+```groovy
+implementation 'io.github.zhaojfGithub.SVGView:SVGView:0.0.3'
+```
+
+### 效果图
+
+![默认](images/demonstration.gif)
+
 
 ### XML属性
 

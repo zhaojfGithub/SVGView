@@ -12,7 +12,7 @@ task androidSourcesJar(type: Jar) {
 
 ext {
     PUBLISH_GROUP_ID = 'io.github.zhaojfGithub.SVGView'
-    PUBLISH_VERSION = '0.0.2'
+    PUBLISH_VERSION = '0.0.3'
 }
 
 ext["signing.keyId"] = ''

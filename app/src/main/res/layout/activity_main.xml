@@ -8,10 +8,12 @@
 
     <com.zjf.svgview.SVGView
         android:id="@+id/SVGView"
-        app:SVGId="@raw/ic_front"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:SVGId="@raw/ic_square"
         app:SVGIsMove="true"
         app:SVGIsZoom="true"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
